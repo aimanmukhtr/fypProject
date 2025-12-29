@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure Algorithm Parameters</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+
+    </style>
+    <script>
+        function updateMutationRate() {
+            const crossoverProb = parseFloat(document.getElementById('crossover_rate').value);
+            const mutationRate = 1 - crossoverProb;
+            document.getElementById('tpot_mutation_rate').value = mutationRate.toFixed(2);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Configure Algorithm Parameters</h1>
+        
+        <form method="POST" action="{{ url_for('configure_parameters') }}">
+            <div class="form-group">
+                <h2>General Settings</h2>
+                <label for="cv_value">Cross-Validation Folds (k-value):</label>
+                <input type="number" id="cv_value" name="cv_value" min="2" max="20" value="5" required>
+            </div>
+            
+            {% if 'random_forest' in selected_algorithms %}
+            <div class="algorithm-config">
+                <h2>Random Forest Parameters</h2>
+                <div class="param-group">
+                    <label for="rf_n_estimators">Number of Trees:</label>
+                    <input type="number" id="rf_n_estimators" name="rf_n_estimators" min="1" value="100">
+                </div>
+                <div class="param-group">
+                    <label for="rf_max_depth">Max Depth:</label>
+                    <input type="number" id="rf_max_depth" name="rf_max_depth" min="1" placeholder="None (unlimited)">
+                </div>
+                <div class="param-group">
+                    <label for="rf_min_samples_split">Min Samples Split:</label>
+                    <input type="number" id="rf_min_samples_split" name="rf_min_samples_split" min="2" value="2">
+                </div>
+                <div class="param-group">
+                    <label for="rf_min_samples_leaf">Min Samples Leaf:</label>
+                    <input type="number" id="rf_min_samples_leaf" name="rf_min_samples_leaf" min="1" value="1">
+                </div>
+                <div class="param-group">
+                    <label for="rf_max_features">Max Features:</label>
+                    <select id="rf_max_features" name="rf_max_features">
+                        <option value="sqrt">sqrt(n_features)</option>
+                        <option value="log2">log2(n_features)</option>
+                        <option value="None">All features</option>
+                    </select>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if 'svm' in selected_algorithms %}
+            <div class="algorithm-config">
+                <h2>SVM Parameters</h2>
+                <div class="param-group">
+                    <label for="svm_C">Regularization (C):</label>
+                    <input type="number" id="svm_C" name="svm_C" min="0.01" step="0.01" value="1.0">
+                </div>
+                <div class="param-group">
+                    <label for="svm_kernel">Kernel:</label>
+                    <select id="svm_kernel" name="svm_kernel">
+                        <option value="rbf">RBF</option>
+                        <option value="linear" selected>Linear</option>
+                        <option value="poly">Polynomial</option>
+                        <option value="sigmoid">Sigmoid</option>
+                    </select>
+                </div>
+                <div class="param-group">
+                    <label for="svm_degree">Degree (for poly kernel):</label>
+                    <input type="number" id="svm_degree" name="svm_degree" min="1" value="3">
+                </div>
+                <div class="param-group">
+                    <label for="svm_gamma">Gamma:</label>
+                    <select id="svm_gamma" name="svm_gamma">
+                        <option value="scale">Scale (1/(n_features * X.var()))</option>
+                        <option value="auto">Auto (1/n_features)</option>
+                    </select>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if 'knn' in selected_algorithms %}
+            <div class="algorithm-config">
+                <h2>KNN Parameters</h2>
+                <div class="param-group">
+                    <label for="knn_n_neighbors">Number of Neighbors:</label>
+                    <input type="number" id="knn_n_neighbors" name="knn_n_neighbors" min="1" value="5">
+                </div>
+                <div class="param-group">
+                    <label for="knn_weights">Weight Function:</label>
+                    <select id="knn_weights" name="knn_weights">
+                        <option value="uniform">Uniform</option>
+                        <option value="distance">Distance</option>
+                    </select>
+                </div>
+                <div class="param-group">
+                    <label for="knn_algorithm">Algorithm:</label>
+                    <select id="knn_algorithm" name="knn_algorithm">
+                        <option value="auto">Auto</option>
+                        <option value="ball_tree">Ball Tree</option>
+                        <option value="kd_tree">KD Tree</option>
+                        <option value="brute">Brute Force</option>
+                    </select>
+                </div>
+                <div class="param-group">
+                    <label for="knn_p">Power Parameter (p):</label>
+                    <input type="number" id="knn_p" name="knn_p" min="1" value="2">
+                    <small>1 for Manhattan, 2 for Euclidean</small>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if 'naive_bayes' in selected_algorithms %}
+            <div class="algorithm-config">
+                <h2>Naive Bayes Parameters</h2>
+                <div class="param-group">
+                    <label for="nb_priors">Class Priors:</label>
+                    <input type="text" id="nb_priors" name="nb_priors" placeholder="e.g., [0.3, 0.7] or leave empty">
+                    <small>List of probabilities for each class</small>
+                </div>
+                <div class="param-group">
+                    <label for="nb_var_smoothing">Var Smoothing:</label>
+                    <input type="number" id="nb_var_smoothing" name="nb_var_smoothing" min="0" step="1e-9" value="1e-9">
+                    <small>Portion of largest variance to add for stability</small>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if 'tpot' in selected_algorithms %}
+            <div class="algorithm-config">
+                <h2>TPOT Parameters</h2>
+                <div class="param-group">
+                    <label for="tpot_generations">Number of Generations:</label>
+                    <input type="number" id="tpot_generations" name="tpot_generations" min="1" value="5">
+                </div>
+                <div class="param-group">
+                    <label for="tpot_population_size">Population Size:</label>
+                    <input type="number" id="tpot_population_size" name="tpot_population_size" min="1" value="20">
+                </div>
+                <div class="param-group">
+                    <label for="tpot_cv">Internal CV Folds:</label>
+                    <input type="number" id="tpot_cv" name="tpot_cv" min="2" value="5">
+                </div>
+                <div class="param-group">
+                    <label for="crossover_rate">Crossover Probability (0-1):</label>
+                    <input type="number" id="crossover_rate" name="crossover_rate" 
+                           min="0" max="1" step="0.1" value="0.5" onchange="updateMutationRate()">
+                </div>
+                <div class="param-group">
+                    <label for="tpot_mutation_rate">Mutation Rate (0-1):</label>
+                    <input type="number" id="tpot_mutation_rate" name="tpot_mutation_rate" 
+                           min="0" max="1" step="0.1" value="0.5" readonly>
+                    <small>Automatically calculated as (1 - crossover probability)</small>
+                </div>
+                <div class="param-group">
+                    <label for="tpot_max_time_mins">Max Time (minutes, optional):</label>
+                    <input type="number" id="tpot_max_time_mins" name="tpot_max_time_mins" 
+                           min="1" placeholder="None (unlimited)">
+                </div>
+            </div>
+            {% endif %}
+            
+            <button type="submit">Run Algorithms with These Parameters</button>
+        </form>
+    </div>
+    
+</body>
+</html>

@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Receipt</title>
+  <style>
+    :root {
+  /* Color system */
+  --color-primary-50: #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3466F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+  
+  --color-secondary-50: #F0FDFA;
+  --color-secondary-100: #CCFBF1;
+  --color-secondary-200: #99F6E4;
+  --color-secondary-300: #5EEAD4;
+  --color-secondary-400: #2DD4BF;
+  --color-secondary-500: #14B8A6;
+  --color-secondary-600: #0D9488;
+  --color-secondary-700: #0F766E;
+  --color-secondary-800: #115E59;
+  --color-secondary-900: #134E4A;
+  
+  --color-accent-50: #FFF7ED;
+  --color-accent-100: #FFEDD5;
+  --color-accent-200: #FED7AA;
+  --color-accent-300: #FDBA74;
+  --color-accent-400: #FB923C;
+  --color-accent-500: #F97316;
+  --color-accent-600: #EA580C;
+  --color-accent-700: #C2410C;
+  --color-accent-800: #9A3412;
+  --color-accent-900: #7C2D12;
+  
+  --color-success-50: #F0FDF4;
+  --color-success-100: #DCFCE7;
+  --color-success-200: #BBF7D0;
+  --color-success-300: #86EFAC;
+  --color-success-400: #4ADE80;
+  --color-success-500: #22C55E;
+  --color-success-600: #16A34A;
+  --color-success-700: #15803D;
+  --color-success-800: #166534;
+  --color-success-900: #14532D;
+  
+  --color-warning-50: #FFFBEB;
+  --color-warning-100: #FEF3C7;
+  --color-warning-200: #FDE68A;
+  --color-warning-300: #FCD34D;
+  --color-warning-400: #FBBF24;
+  --color-warning-500: #F59E0B;
+  --color-warning-600: #D97706;
+  --color-warning-700: #B45309;
+  --color-warning-800: #92400E;
+  --color-warning-900: #78350F;
+  
+  --color-error-50: #FEF2F2;
+  --color-error-100: #FEE2E2;
+  --color-error-200: #FECACA;
+  --color-error-300: #FCA5A5;
+  --color-error-400: #F87171;
+  --color-error-500: #EF4444;
+  --color-error-600: #DC2626;
+  --color-error-700: #B91C1C;
+  --color-error-800: #991B1B;
+  --color-error-900: #7F1D1D;
+  
+  --color-gray-50: #F9FAFB;
+  --color-gray-100: #F3F4F6;
+  --color-gray-200: #E5E7EB;
+  --color-gray-300: #D1D5DB;
+  --color-gray-400: #9CA3AF;
+  --color-gray-500: #6B7280;
+  --color-gray-600: #4B5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1F2937;
+  --color-gray-900: #111827;
+  
+  /* Spacing system (8px base) */
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem;  /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem;    /* 16px */
+  --space-5: 1.25rem; /* 20px */
+  --space-6: 1.5rem;  /* 24px */
+  --space-8: 2rem;    /* 32px */
+  --space-10: 2.5rem; /* 40px */
+  --space-12: 3rem;   /* 48px */
+  --space-16: 4rem;   /* 64px */
+  --space-20: 5rem;   /* 80px */
+  
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  
+  /* Border radius */
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.375rem; /* 6px */
+  --radius-lg: 0.5rem;  /* 8px */
+  --radius-xl: 0.75rem; /* 12px */
+  --radius-2xl: 1rem;   /* 16px */
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  line-height: 1.5;
+  color: var(--color-gray-800);
+  background-color: var(--color-gray-50);
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+/* App layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  padding: var(--space-8) 0;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-gray-900);
+  margin-bottom: var(--space-4);
+}
+
+h1 {
+  font-size: 1.875rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+p {
+  margin-bottom: var(--space-4);
+}
+
+/* Header styles */
+.app-header {
+  background-color: white;
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4) 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--color-primary-600);
+}
+
+.logo-icon {
+  margin-right: var(--space-2);
+  color: var(--color-primary-600);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.user-name {
+  font-weight: 500;
+  color: var(--color-gray-700);
+}
+
+/* Footer styles */
+.app-footer {
+  background-color: var(--color-gray-800);
+  color: var(--color-gray-200);
+  padding: var(--space-6) 0;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  
+  .user-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .app-main {
+    padding: var(--space-6) 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 var(--space-8);
+  }
+}
+  </style>
+  <style>
+    /* Upload section styles */
+.upload-section {
+  background-color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-8);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.section-description {
+  color: var(--color-gray-600);
+  margin-bottom: var(--space-6);
+}
+
+/* Upload form */
+.upload-form-container {
+  margin-bottom: var(--space-6);
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Dropzone */
+.dropzone {
+  border: 2px dashed var(--color-gray-300);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  position: relative;
+  text-align: center;
+  transition: border-color var(--transition-normal), background-color var(--transition-normal);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.dropzone:hover, .dropzone.dragover {
+  border-color: var(--color-primary-400);
+  background-color: var(--color-primary-50);
+}
+
+.dropzone:hover .upload-icon, .dropzone.dragover .upload-icon {
+  color: var(--color-primary-500);
+  transform: translateY(-5px);
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.upload-icon {
+  color: var(--color-gray-400);
+  margin-bottom: var(--space-2);
+  transition: color var(--transition-normal), transform var(--transition-normal);
+}
+
+.dropzone-text {
+  font-size: 1.125rem;
+  color: var(--color-gray-700);
+  margin-bottom: var(--space-2);
+}
+
+.browse-text {
+  color: var(--color-primary-600);
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dropzone-hint {
+  font-size: 0.875rem;
+  color: var(--color-gray-500);
+  margin-bottom: 0;
+}
+
+.file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* File info */
+.file-info {
+  display: none;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+}
+
+.file-info.active {
+  display: grid;
+}
+
+.file-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.file-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-preview svg {
+  color: var(--color-gray-500);
+}
+
+.file-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.file-name {
+  font-weight: 500;
+  color: var(--color-gray-800);
+  word-break: break-all;
+}
+
+.file-size {
+  font-size: 0.875rem;
+  color: var(--color-gray-600);
+}
+
+.file-type {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-700);
+  border-radius: var(--radius-sm);
+}
+
+/* Form actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Animation keyframes */
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Apply animations */
+.upload-section {
+  animation: slideDown 0.3s ease-out;
+}
+
+.dropzone:hover .upload-icon {
+  animation: bounce 1s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .upload-section {
+    padding: var(--space-4);
+  }
+  
+  .dropzone {
+    padding: var(--space-4);
+  }
+  
+  .file-info {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .file-preview {
+    margin: 0 auto;
+  }
+  
+  .form-actions {
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .upload-section {
+    padding: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .upload-section {
+    padding: var(--space-8);
+  }
+}
+  </style>
+  <style>
+    /* Button styles */
+.btn-primary,
+.btn-secondary,
+.btn-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  position: relative;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background-color: var(--color-primary-600);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-700);
+}
+
+.btn-primary:active {
+  background-color: var(--color-primary-800);
+}
+
+.btn-primary:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+.btn-primary:disabled {
+  background-color: var(--color-gray-400);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--color-gray-700);
+  border: 1px solid var(--color-gray-300);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-gray-50);
+  border-color: var(--color-gray-400);
+}
+
+.btn-secondary:active {
+  background-color: var(--color-gray-100);
+}
+
+.btn-secondary:focus {
+  box-shadow: 0 0 0 3px rgba(209, 213, 219, 0.5);
+}
+
+.btn-text {
+  background-color: transparent;
+  color: var(--color-primary-600);
+  padding: var(--space-1) var(--space-2);
+}
+
+.btn-text:hover {
+  background-color: var(--color-primary-50);
+}
+
+.btn-text:active {
+  background-color: var(--color-primary-100);
+}
+
+.btn-text:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+/* Spinner */
+.spinner {
+  display: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner.active {
+  display: block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Button loading state */
+.btn-primary.loading .btn-text {
+  visibility: hidden;
+}
+
+.btn-primary.loading .spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -0.5rem;
+  margin-left: -0.5rem;
+}
+
+/* Alert styles */
+.alert {
+  display: none;
+  align-items: center;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-6);
+  position: relative;
+  animation: slideIn var(--transition-normal);
+}
+
+.alert.active {
+  display: flex;
+}
+
+.success-alert {
+  background-color: var(--color-success-50);
+  border-left: 4px solid var(--color-success-500);
+  color: var(--color-success-800);
+}
+
+.error-alert {
+  background-color: var(--color-error-50);
+  border-left: 4px solid var(--color-error-500);
+  color: var(--color-error-800);
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  margin-right: var(--space-3);
+}
+
+.success-alert .alert-icon {
+  color: var(--color-success-500);
+}
+
+.error-alert .alert-icon {
+  color: var(--color-error-500);
+}
+
+.alert-message {
+  flex-grow: 1;
+}
+
+.alert-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: currentColor;
+  opacity: 0.7;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition-fast), background-color var(--transition-fast);
+}
+
+.alert-close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+  
+  .alert {
+    padding: var(--space-3);
+  }
+}
+  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+</head>
+<body>
+
+  <div id="rejection-alert" style="
+  display: none;
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  text-align: center;
+"></div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const msg = sessionStorage.getItem('rejectionMessage');
+    if (msg) {
+      const alertBox = document.getElementById('rejection-alert');
+      alertBox.textContent = msg;
+      alertBox.style.display = 'block';
+      sessionStorage.removeItem('rejectionMessage');
+    }
+  });
+</script>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="logo-icon"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-7h-2c0-1-1.5-3-1-3"></path><path d="M2 9v1c0 1.1.9 2 2 2h1"></path><path d="M16 11h0"></path></svg>
+            <span>ReceiptVault</span>
+          </div>
+          <div class="user-info">
+            <span class="user-name" id="userName">Loading...</span>
+            <button id="logoutBtn" class="btn-secondary">Logout</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="container">
+        <section class="upload-section">
+          <h1>Upload Payment Receipt</h1>
+          <p class="section-description">Upload your receipt as an image or PDF file. Supported formats: JPG, PNG, PDF.</p>
+          
+          <div class="upload-form-container">
+            <form id="uploadForm" class="upload-form" action="/upload_receipt" method="POST" enctype="multipart/form-data">
+              <input type="hidden" id="userUid" name="uid" value="">
+              
+              <div class="dropzone" id="dropzone">
+                <div class="dropzone-content">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="upload-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <p class="dropzone-text">Drag and drop your file here or <span class="browse-text">browse</span></p>
+                  <p class="dropzone-hint">Max file size: 10MB</p>
+                </div>
+                <input type="file" id="fileInput" name="receipt" accept=".jpg,.jpeg,.png,.pdf" class="file-input">
+              </div>
+              
+              <div class="file-info" id="fileInfo">
+                <div class="file-preview" id="filePreview"></div>
+                <div class="file-details" id="fileDetails"></div>
+                <button type="button" id="removeFileBtn" class="btn-text">Remove</button>
+              </div>
+              
+              <div class="form-actions">
+                <button type="submit" id="submitBtn" class="btn-primary" disabled>
+                  <span class="btn-text">Upload Receipt</span>
+                  <span class="spinner" id="submitSpinner"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <div class="alert success-alert" id="successAlert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="alert-icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span class="alert-message">Receipt uploaded successfully!</span>
+            <button class="alert-close" data-alert-id="successAlert">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+          
+          <div class="alert error-alert" id="errorAlert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="alert-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span class="alert-message" id="errorMessage">An error occurred. Please try again.</span>
+            <button class="alert-close" data-alert-id="errorAlert">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <div class="container">
+        <p>&copy; 2025 ReceiptVault. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
+  
+  <!-- Application Scripts -->
+  <script type="module">
+    // Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDutZ9Ue_wOmtvXUHrJuWuTplCFGfrvoLM",
+  authDomain: "fypautoml.firebaseapp.com",
+  projectId: "fypautoml",
+  storageBucket: "fypautoml.firebasestorage.app",
+  messagingSenderId: "945914686130",
+  appId: "1:945914686130:web:ea30eab865086e1bff77ab",
+  measurementId: "G-D0XJLZ2HXX"
+};
+
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+const firestore = firebase.firestore();
+
+// Auth state observer
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if user is logged in
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      // User is signed in
+      handleSignedInUser(user);
+    } else {
+      // No user is signed in, redirect to register page
+      window.location.href = '/register';
+    }
+  });
+
+  // Logout button
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function() {
+      firebase.auth().signOut().then(() => {
+        // Sign-out successful, redirect to login
+        window.location.href = '/register';
+      }).catch((error) => {
+        // An error happened during sign-out
+        console.error('Logout error:', error);
+        showError('Error signing out. Please try again.');
+      });
+    });
+  }
+});
+
+// Handle signed-in user
+function handleSignedInUser(user) {
+  // Set user UID in the hidden form field
+  const userUidInput = document.getElementById('userUid');
+  if (userUidInput) {
+    userUidInput.value = user.uid;
+  }
+  
+  // Display user name or email
+  const userNameElement = document.getElementById('userName');
+  if (userNameElement) {
+    userNameElement.textContent = user.displayName || user.email || 'User';
+  }
+  
+  // Enable form submission
+  const submitBtn = document.getElementById('submitBtn');
+  if (submitBtn) {
+    submitBtn.disabled = false;
+  }
+}
+
+// Error handling (saving)
+function showError(message) {
+  const errorAlert = document.getElementById('errorAlert');
+  const errorMessage = document.getElementById('errorMessage');
+  
+  if (errorAlert && errorMessage) {
+    errorMessage.textContent = message;
+    errorAlert.classList.add('active');
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      errorAlert.classList.remove('active');
+    }, 5000);
+  }
+}
+
+function saveReceiptToFirestore(downloadURL, fileName) {
+  const db = firebase.firestore();
+  const userUid = document.getElementById('userUid').value;
+
+  db.collection('receipts').add({
+    user_uid: userUid,
+    file_name: fileName,
+    file_size: selectedFile.size,
+    file_type: selectedFile.type,
+    upload_time: firebase.firestore.FieldValue.serverTimestamp(),
+    download_url: downloadURL
+  }).then(() => {
+    showSuccess('Receipt uploaded successfully!');
+  }).catch(error => {
+    showError('Error saving metadata to Firestore: ' + error.message);
+  });
+}
+
+function showSuccess(message) {
+   const successAlert = document.getElementById('successAlert');
+   successAlert.querySelector('.alert-message').textContent = message;
+   successAlert.classList.add('active');
+   setTimeout(() => {
+     successAlert.classList.remove('active');
+   }, 5000);
+}
+
+
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+  const uploadForm = document.getElementById('uploadForm');
+  const fileInput = document.getElementById('fileInput');
+  const dropzone = document.getElementById('dropzone');
+  const fileInfo = document.getElementById('fileInfo');
+  const filePreview = document.getElementById('filePreview');
+  const fileDetails = document.getElementById('fileDetails');
+  const removeFileBtn = document.getElementById('removeFileBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitSpinner = document.getElementById('submitSpinner');
+  const successAlert = document.getElementById('successAlert');
+  const errorAlert = document.getElementById('errorAlert');
+  
+  let selectedFile = null;
+  submitBtn.disabled = true;
+
+  
+  // File input change handler
+  fileInput.addEventListener('change', handleFileSelect);
+  
+  // Drag and drop handlers
+  dropzone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.classList.add('dragover');
+  });
+  
+  dropzone.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.classList.remove('dragover');
+  });
+  
+  dropzone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.classList.remove('dragover');
+    
+    if (e.dataTransfer.files.length) {
+      fileInput.files = e.dataTransfer.files;
+      handleFileSelect(e);
+    }
+  });
+  
+  // Remove file button
+  removeFileBtn.addEventListener('click', function() {
+    resetFileUpload();
+  });
+  
+  // Form submission
+  uploadForm.addEventListener('submit', function(e) {
+    // e.preventDefault();
+    
+    if (!selectedFile) {
+      showError('Please select a file to upload.');
+      return;
+    }
+    
+    // Get user UID
+    const userUid = document.getElementById('userUid').value;
+    
+    if (!userUid) {
+      showError('User authentication failed. Please log in again.');
+      return;
+    }
+    
+    // Show loading state
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    submitSpinner.classList.add('active');
+    
+    // Simulate file upload (in a real app, you would upload to Firebase Storage or your server)
+    /*uploadFileToFirebase(selectedFile, userUid)
+  .then(() => {
+    updateUserStatus(userUid, 'waiting_review');
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+    submitSpinner.classList.remove('active');
+    showSuccess();
+    resetFileUpload();
+    window.location.href = '/waiting_page.html'
+  })
+  .catch(error => {
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+    submitSpinner.classList.remove('active');
+    showError(error.message || 'An error occurred during upload. Please try again.');
+  });*/
+
+  });
+  
+  // Initialize alert close buttons
+  const closeButtons = document.querySelectorAll('.alert-close');
+  closeButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const alertId = this.getAttribute('data-alert-id');
+      const alert = document.getElementById(alertId);
+      if (alert) {
+        alert.classList.remove('active');
+      }
+    });
+  });
+  
+  // File selection handler
+  function handleFileSelect(e) {
+    const file = fileInput.files[0];
+    
+    if (!file) {
+      return;
+    }
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
+      showError('Invalid file type. Please upload a JPG, PNG, or PDF file.');
+      resetFileUpload();
+      return;
+    }
+    
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (file.size > maxSize) {
+      showError('File is too large. Maximum file size is 10MB.');
+      resetFileUpload();
+      return;
+    }
+    
+    // Store the selected file
+    selectedFile = file;
+    
+    // Update file preview
+    updateFilePreview(file);
+    
+    // Show file info
+    fileInfo.classList.add('active');
+    
+    // Enable submit button
+    submitBtn.disabled = false;
+  }
+
+  // Update the user status to 'waiting_review' in Firestore
+  function updateUserStatus(userUid, status) {
+    const db = firebase.firestore();
+    db.collection('Users').doc(userUid).update({
+      status: status,
+    }).then(() => {
+      console.log('User status updated to:', status);
+    }).catch((error) => {
+      console.error('Error updating status:', error);
+      showError('Failed to update user status.');
+    });
+  }
+  
+  // Update file preview
+  function updateFilePreview(file) {
+    // Clear previous preview
+    filePreview.innerHTML = '';
+    fileDetails.innerHTML = '';
+    
+    // Create preview based on file type
+    if (file.type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.onload = function() {
+        URL.revokeObjectURL(this.src);
+      };
+      filePreview.appendChild(img);
+    } else {
+      // PDF icon for PDF files
+      filePreview.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <path d="M9 15h6"></path>
+          <path d="M9 11h6"></path>
+        </svg>
+      `;
+    }
+    
+    // Add file details
+    const fileNameElem = document.createElement('div');
+    fileNameElem.className = 'file-name';
+    fileNameElem.textContent = file.name;
+    
+    const fileSizeElem = document.createElement('div');
+    fileSizeElem.className = 'file-size';
+    fileSizeElem.textContent = formatFileSize(file.size);
+    
+    const fileTypeElem = document.createElement('div');
+    fileTypeElem.className = 'file-type';
+    fileTypeElem.textContent = file.type.split('/')[1].toUpperCase();
+    
+    fileDetails.appendChild(fileNameElem);
+    fileDetails.appendChild(fileSizeElem);
+    fileDetails.appendChild(fileTypeElem);
+  }
+  
+  // Reset file upload
+  function resetFileUpload() {
+    fileInput.value = '';
+    selectedFile = null;
+    fileInfo.classList.remove('active');
+    submitBtn.disabled = true;
+  }
+  
+  // Format file size
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  
+  // Simulate file upload (replace with actual upload logic)
+  async function uploadFileToFirebase(file, uid) {
+  try {
+    // 1. Define storage path with timestamp
+    const timestamp = Date.now();
+    const storageRef = firebase.storage().ref(`receipts/${uid}/${timestamp}_${file.name}`);
+    
+    // 2. Upload file
+    const snapshot = await storageRef.put(file);
+    
+    // 3. Get public download URL
+    const downloadURL = await snapshot.ref.getDownloadURL();
+
+    // 4. Save metadata to Firestore
+    await firebase.firestore().collection('receipts').add({
+      user_uid: uid,
+      file_name: file.name,
+      file_size: file.size,
+      file_type: file.type,
+      upload_time: firebase.firestore.FieldValue.serverTimestamp(),
+      download_url: downloadURL
+    });
+
+    // 5. Return result
+    return {
+      downloadUrl: downloadURL,
+      fileName: file.name,
+      fileSize: file.size
+    };
+  } catch (error) {
+    console.error('Upload failed:', error);
+    throw new Error('An error occurred while uploading the file. Please try again.');
+  }
+}
+  
+
+  // Enable the submit button when a file is selected
+      fileInput.addEventListener('change', function() {
+        if (fileInput.files.length > 0) {
+          submitBtn.disabled = false;  // Enable submit button
+        } else {
+          submitBtn.disabled = true;   // Disable submit button
+        }
+      });
+
+   // Optional: Disable submit button if file is removed
+      removeFileBtn.addEventListener('click', function() {
+        submitBtn.disabled = true;  // Disable submit button after file removal
+      });
+});
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+  // Enhance user interactions with animations and feedback
+  
+  // Dropzone click to activate file input
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  
+  if (dropzone && fileInput) {
+    dropzone.addEventListener('click', function(e) {
+      // Only trigger if the click wasn't on the input itself
+      if (e.target !== fileInput) {
+        fileInput.click();
+      }
+    });
+  }
+  
+  // Focus states for accessibility
+  const focusableElements = document.querySelectorAll('button, input, a');
+  focusableElements.forEach(element => {
+    element.addEventListener('focus', function() {
+      this.classList.add('focus-visible');
+    });
+    
+    element.addEventListener('blur', function() {
+      this.classList.remove('focus-visible');
+    });
+  });
+  
+  // Dynamic page title update
+  document.title = 'Upload Receipt | ReceiptVault';
+  
+  // Prevent accidental page navigation when upload in progress
+  window.addEventListener('beforeunload', function(e) {
+    const isLoading = document.getElementById('submitBtn')?.classList.contains('loading');
+    
+    if (isLoading) {
+      // Cancel the event and show confirmation dialog
+      e.preventDefault();
+      // Chrome requires returnValue to be set
+      e.returnValue = 'Upload in progress. Are you sure you want to leave?';
+      return 'Upload in progress. Are you sure you want to leave?';
+    }
+  });
+  
+  // Add visual feedback for all interactive elements
+  addButtonFeedback();
+  
+  // Detect support for various features and apply fallbacks if needed
+  detectFeatureSupport();
+});
+
+// Add visual feedback for buttons
+function addButtonFeedback() {
+  const buttons = document.querySelectorAll('button');
+  
+  buttons.forEach(button => {
+    button.addEventListener('mousedown', function() {
+      this.style.transform = 'scale(0.98)';
+    });
+    
+    button.addEventListener('mouseup', function() {
+      this.style.transform = 'scale(1)';
+    });
+    
+    button.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+    });
+  });
+}
+
+// Detect browser support for features and apply fallbacks
+function detectFeatureSupport() {
+  // Check if the browser supports the File API
+  if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+    const uploadSection = document.querySelector('.upload-section');
+    if (uploadSection) {
+      const warningDiv = document.createElement('div');
+      warningDiv.className = 'alert error-alert active';
+      warningDiv.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="alert-icon">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span class="alert-message">Your browser doesn't fully support file uploads. Please use a modern browser like Chrome, Firefox, Safari, or Edge.</span>
+      `;
+      uploadSection.prepend(warningDiv);
+    }
+  }
+  
+  // Check for drag and drop support
+  const div = document.createElement('div');
+  if (!('draggable' in div) || !('ondragstart' in div && 'ondrop' in div)) {
+    const dropzone = document.getElementById('dropzone');
+    if (dropzone) {
+      dropzone.querySelector('.dropzone-text').textContent = 'Click to browse files';
+      dropzone.querySelector('.dropzone-hint').textContent = 'Drag and drop not supported in this browser';
+    }
+  }
+}
+  </script>
+</body>
+</html>

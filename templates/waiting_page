@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Approval - Waiting for Review</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --green-100: #dcfce7;
+  --green-500: #22c55e;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(180deg, var(--gray-50) 0%, var(--blue-50) 100%);
+  color: var(--gray-800);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 1.5rem;
+  max-width: 32rem;
+  width: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+}
+
+.content {
+  text-align: center;
+}
+
+.illustration {
+  position: relative;
+  margin-bottom: 2rem;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  position: absolute;
+}
+
+.icon-left {
+  left: -3rem;
+  top: 0.5rem;
+  transform: rotate(-12deg);
+  color: var(--blue-400);
+  animation: bounce 3s infinite;
+}
+
+.icon-center {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  color: var(--blue-600);
+}
+
+.icon-right {
+  right: -2.5rem;
+  top: 1rem;
+  transform: rotate(12deg);
+  color: var(--green-500);
+  animation: pulse 2s infinite;
+}
+
+.file-check-icon {
+  background: var(--blue-100);
+  color: var(--blue-600);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.status-container h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 1rem;
+}
+
+.timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--blue-600);
+  margin-bottom: 1rem;
+}
+
+.progress-indicator {
+  margin: 1.5rem 0;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid var(--blue-100);
+  border-top-color: var(--blue-500);
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+.message {
+  margin: 1.5rem 0;
+}
+
+.message p {
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.message .subtitle {
+  color: var(--gray-600);
+  font-size: 0.875rem;
+}
+
+.status-bar {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.pulse-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--blue-400);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-bar p {
+  color: var(--blue-600);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0) rotate(-12deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-12deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .illustration {
+    height: 100px;
+  }
+
+  .icon-left {
+    left: -2rem;
+  }
+
+  .icon-right {
+    right: -2rem;
+  }
+
+  .status-container h1 {
+    font-size: 1.5rem;
+  }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="content">
+                <div class="illustration">
+                    <div class="icon icon-left">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path><rect width="6" height="4" x="9" y="3" rx="2"></rect><path d="m9 14 2 2 4-4"></path></svg>
+                    </div>
+                    <div class="icon-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <div class="icon icon-right">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                    </div>
+                </div>
+
+                <div class="status-container">
+                    <div class="file-check-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="m9 15 2 2 4-4"></path></svg>
+                    </div>
+
+                    <h1>Receipt Successfully Uploaded</h1>
+
+                    <div class="timer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span id="elapsed-time">00:00</span>
+                    </div>
+
+                    <div class="progress-indicator">
+                        <div class="spinner"></div>
+                    </div>
+
+                    <div class="message">
+                        <p>Your receipt is currently being reviewed by our team.</p>
+                        <p class="subtitle">You'll be automatically redirected once your receipt has been approved.</p>
+                    </div>
+
+                    <div class="status-bar">
+                        <div class="pulse-dot"></div>
+                        <p>Review in progress</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
+    <script>
+      // Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDutZ9Ue_wOmtvXUHrJuWuTplCFGfrvoLM",
+    authDomain: "fypautoml.firebaseapp.com",
+    projectId: "fypautoml",
+    storageBucket: "fypautoml.firebasestorage.app",
+    messagingSenderId: "945914686130",
+    appId: "1:945914686130:web:ea30eab865086e1bff77ab",
+    measurementId: "G-D0XJLZ2HXX"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const firestore = firebase.firestore();
+const auth = firebase.auth();
+
+// Timer functionality
+let timeElapsed = 0;
+const timerElement = document.getElementById('elapsed-time');
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function updateTimer() {
+    timeElapsed++;
+    timerElement.textContent = formatTime(timeElapsed);
+}
+
+// Start the timer
+setInterval(updateTimer, 1000);
+
+// Main status logic
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      const userRef = firestore.collection('Users').doc(user.uid);
+      userRef.onSnapshot((doc) => {
+        if (doc.exists) {
+          const status = doc.data().status;
+          switch (status) {
+            case 'approved':
+              showApprovalState();
+              setTimeout(() => {
+                window.location.href = '/index';
+              }, 2000);
+              break;
+            case 'pending':
+              window.location.href = '/select_license';
+              break;
+            case 'rejected':
+              showRejectedMessage();
+              setTimeout(() => {
+                window.location.href = '/upload_receipt';
+              }, 4000);
+              break;
+            case 'waiting_review':
+            default:
+              // Stay on the page
+              break;
+          }
+        }
+      });
+    } else {
+      window.location.href = '/';
+    }
+  });
+
+function showApprovalState() {
+    const container = document.querySelector('.status-container');
+    container.innerHTML = `
+        <div class="file-check-icon" style="background: var(--green-100);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--green-500);">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                <path d="m9 12 2 2 4-4"></path>
+            </svg>
+        </div>
+        <h1>Receipt Approved!</h1>
+        <p style="color: var(--gray-600);">Your receipt has been approved. Redirecting you now...</p>
+        <div class="progress-indicator">
+            <div class="spinner"></div>
+        </div>
+    `;
+}
+
+// Call the function when the page is loaded
+window.onload = checkUserStatus;
+    </script>
+</body>
+</html>

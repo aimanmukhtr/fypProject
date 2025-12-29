@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Target Column</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .task-type-banner {
+            background-color: #e9f7fe;
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #17a2b8;
+            font-size: 16px;
+        }
+        
+        .correlation-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .correlation-matrix th {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa;
+        }
+        
+        .matrix-container {
+            max-height: 400px;
+            overflow: auto;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        
+        .algorithm-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .algorithm-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 12px;
+            transition: all 0.2s;
+        }
+        
+        .algorithm-card:hover {
+            border-color: #17a2b8;
+            box-shadow: 0 0 10px rgba(23, 162, 184, 0.1);
+        }
+        
+        .algorithm-card.disabled {
+            opacity: 0.6;
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+        
+        .algorithm-card.disabled:hover {
+            border-color: #dee2e6;
+            box-shadow: none;
+        }
+        
+        .preview-table {
+            font-size: 14px;
+        }
+        
+        .target-selector {
+            margin-bottom: 25px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+        
+        .recommended-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .regression-warning {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .algorithm-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .algorithm-category {
+            margin: 25px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #17a2b8;
+        }
+        .algorithm-category h3 {
+            color: #17a2b8;
+            margin-bottom: 15px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+/* Container for Dual List Box */
+.dual-list-container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+}
+
+/* Title and Description */
+.dual-list-container h2 {
+    font-size: 1.5rem;
+    color: #343a40;
+    margin-bottom: 10px;
+}
+
+.dual-list-container p {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* The Dual List Container (flexbox layout) */
+.dual-list {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* List Containers */
+.list-container {
+    width: 40%;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.list-container h3 {
+    font-size: 1.1rem;
+    color: #17a2b8;
+    margin-bottom: 10px;
+}
+
+/* List Items */
+ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+li {
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+li:hover {
+    background-color: #e9f7fe;
+}
+
+/* Buttons for moving items between lists */
+.actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+button {
+    padding: 12px 16px;
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #138496;
+}
+
+button:disabled {
+    background-color: #ced4da;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dual-list {
+        flex-direction: column;
+    }
+
+    .list-container {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
+
+/* Styling for Selected Items */
+li.selected {
+    background-color: #17a2b8;  /* Blue background for selected items */
+    color: white;                /* White text for contrast */
+    font-weight: bold;           /* Make selected text bold */
+}
+
+/* Hover effect for selected items */
+li.selected:hover {
+    background-color: #138496;   /* Darker blue on hover */
+    cursor: pointer;             /* Change cursor to pointer */
+}
+
+/* Styling for unselected items on hover */
+li:hover {
+    background-color: #e9f7fe;   /* Light blue background on hover */
+    cursor: pointer;             /* Show pointer cursor when hovering */
+}
+
+.correlation-matrix td.positive {
+    background-color: rgba(40, 167, 69, 0.8); /* Green */
+    color: white;
+}
+
+.correlation-matrix td.negative {
+    background-color: rgba(220, 53, 69, 0.8); /* Red */
+    color: white;
+}
+
+.correlation-matrix td.diagonal {
+    background-color: #f0f0f0 !important; /* Force neutral background */
+    color: #888 !important; /* Less noticeable text */
+    font-weight: normal; /* Optionally remove bolding */
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Select Target Column and Algorithms</h1>
+        <p>Dataset: <strong>{{ filename }}</strong></p>
+        
+        <div class="target-selector">
+            <h2>1. Select Target Column</h2>
+            <select name="target_column" id="targetColumn" required>
+                <option value="">-- Select target column --</option>
+                {% for column in columns %}
+                <option value="{{ column }}" {% if column == selected_target %}selected{% endif %}>{{ column }}</option>
+                {% endfor %}
+            </select>
+            <div id="targetTypeInfo" class="task-type-banner" style="display:none;">
+                Detected task type: <strong id="taskTypeDisplay"></strong>
+            </div>
+        </div>
+
+        <div class="dataset-preview">
+            <h2>Dataset Preview</h2>
+            {{ preview | safe }}
+        </div>
+
+        {% if corr_matrix and not corr_matrix.startswith('<p>') %}
+        <div class="correlation-section">
+            <h2>Feature Correlations</h2>
+            <div class="matrix-container">
+                {{ corr_matrix | safe }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Dual List Box (Feature Selector) -->
+        <input type="hidden" id="columnsData" value="{{ columns | tojson }}">
+        <div class="dual-list-container">
+            <h2>2. Select Features</h2>
+            <p>Choose features to include in model training by moving them to the right.</p>
+            <div class="dual-list">
+                <!-- Available Features List -->
+                <div class="list-container">
+                    <h3>Available Features</h3>
+                    <ul id="availableFeatures">
+                        {% for column in columns %}
+                            {% if column != selected_target %}  <!-- Exclude the target column -->
+                                <li>{{ column }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Actions (Add/Remove buttons) -->
+                <div class="actions">
+                    <button id="addButton" class="action-btn">Add →</button>
+                    <button id="removeButton" class="action-btn">← Remove</button>
+                </div>
+
+                <!-- Selected Features List -->
+                <div class="list-container">
+                    <h3>Selected Features</h3>
+                    <ul id="selectedFeatures">
+                        <!-- Dynamically populated -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('select_target') }}">
+            <input type="hidden" name="target_column" id="formTargetColumn" value="{{ session.get('target_column', '') }}">
+            
+            <div class="algorithm-selection">
+                <h2>3. Select Algorithms</h2>
+                <div class="algorithm-category">
+                    <h3>Conventional Machine Learning</h3>
+                    <div class="algorithm-options">
+                        <label class="algorithm-card">
+                            <input type="checkbox" name="algorithms" value="random_forest" 
+                                {% if 'random_forest' in selected_algorithms %}checked{% endif %}>
+                            <strong>Random Forest</strong>
+                            <span class="recommended-badge">Recommended</span>
+                            <p class="text-muted">Ensemble of decision trees</p>
+                        </label>
+                        
+                        <label class="algorithm-card">
+                            <input type="checkbox" name="algorithms" value="svm" 
+                                {% if 'svm' in selected_algorithms %}checked{% endif %}>
+                            <strong>Support Vector Machine</strong>
+                            <p class="text-muted">Effective for high-dimensional spaces</p>
+                        </label>
+                        
+                        <label class="algorithm-card">
+                            <input type="checkbox" name="algorithms" value="knn"
+                                {% if 'knn' in selected_algorithms %}checked{% endif %}>
+                            <strong>K-Nearest Neighbors</strong>
+                            <p class="text-muted">Simple instance-based learning</p>
+                        </label>
+                        
+                        <label class="algorithm-card" id="naiveBayesCard">
+                            <input type="checkbox" name="algorithms" value="naive_bayes" id="naiveBayesCheckbox"
+                                {% if 'naive_bayes' in selected_algorithms %}checked{% endif %}>
+                            <strong>Naive Bayes</strong>
+                            <p class="text-muted">Fast probabilistic classifier</p>
+                            <div class="regression-warning">Not available for regression tasks</div>
+                        </label>
+                    </div>
+                </div>
+            
+                <div class="algorithm-category">
+                    <h3>AutoML (Automated Machine Learning)</h3>
+                    <div class="algorithm-options">
+                        <label class="algorithm-card automl-card">
+                            <input type="checkbox" class = "automl-checkbox" name="algorithms" value="tpot"
+                                {% if 'tpot' in selected_algorithms %}checked{% endif %}>
+                            <strong>TPOT AutoML</strong>
+                            <span class="recommended-badge">Recommended</span>
+                            <p class="text-muted">Automatically finds the best pipeline</p>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="button" id="submitButton">
+                <i class="fas fa-play"></i> Run Training and Testing
+            </button>
+        </form>
+    </div>
+
+    <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const targetSelect = document.getElementById('targetColumn');
+    const formTargetInput = document.getElementById('formTargetColumn');
+    const taskTypeDisplay = document.getElementById('taskTypeDisplay');
+    const targetTypeInfo = document.getElementById('targetTypeInfo');
+    const submitButton = document.getElementById('submitButton');
+    const naiveBayesCard = document.getElementById('naiveBayesCard');
+    const naiveBayesCheckbox = document.getElementById('naiveBayesCheckbox');
+    const regressionWarning = document.querySelector('#naiveBayesCard .regression-warning');
+    const userLicenseType = JSON.parse('{{ license_type | default(1) }}');
+    const addButton = document.getElementById('addButton');
+    const removeButton = document.getElementById('removeButton');
+    const availableList = document.getElementById('availableFeatures');
+    const selectedList = document.getElementById('selectedFeatures');
+    const automlCards = document.querySelectorAll('.automl-card');  // All AutoML cards (TPOT)
+    const cells = document.querySelectorAll('.correlation-matrix td'); // Select all table cells
+
+    cells.forEach((cell, index) => {
+    let value = parseFloat(cell.innerText); // Get the value from the cell
+    const numColumns = document.querySelectorAll('.correlation-matrix th').length; // Get the number of columns
+    const row = Math.floor(index / numColumns); // Determine row index
+    const col = numColumns % index; // Determine column index
+
+    if (row === col) {
+        cell.classList.add('diagonal');  // Add special class to diagonal cells
+        return; // **Skip** the rest of the logic for diagonal cells, don't add "positive" or "negative"
+    }
+
+    // Apply different color classes based on the value for non-diagonal cells
+    if (value > 0.5) {
+        cell.classList.add('positive');
+    } else if (value < -0.5) {
+        cell.classList.add('negative');
+    } else {
+        cell.classList.add('neutral');
+    }
+});
+
+
+    function enforceLicenseRestrictions(userLicenseType) {
+      if (userLicenseType == 1) {
+            // Disable AutoML (TPOT) for basic license (license type 1)
+            automlCards.forEach(card => {
+                const checkbox = card.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.disabled = true;
+                    checkbox.checked = false;  // Uncheck the checkbox
+                }
+                card.classList.add('disabled');  // Apply disabled styling
+            });
+        } else if (userLicenseType == 2) {
+            // Enable AutoML (TPOT) for advanced license (license type 2)
+            automlCards.forEach(card => {
+                const checkbox = card.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.disabled = false;  // Enable the checkbox
+                }
+                card.classList.remove('disabled');  // Remove disabled styling
+            });
+        }
+    }
+
+    enforceLicenseRestrictions(userLicenseType);
+
+
+    function disableNaiveBayesIfRegression(targetCol) {
+      const sampleValues = columnData[targetCol] || [];
+      let isNumeric = sampleValues.every(val => !isNaN(val) && val !== '');
+      let uniqueValues = Array.from(new Set(sampleValues.map(val => parseFloat(val))));
+      let isClassification = false;
+
+      if (isNumeric) {
+        let allIntegers = uniqueValues.every(v => Number.isInteger(v));
+        if (uniqueValues.length <= 15 && allIntegers) {
+          isClassification = true;
+        }
+      } else {
+        isClassification = true;
+      }
+
+      const taskType = isClassification ? 'Classification' : 'Regression';
+      taskTypeDisplay.textContent = taskType;
+      targetTypeInfo.style.display = 'block';
+
+      if (!isClassification) {
+        naiveBayesCard.classList.add('disabled');
+        naiveBayesCheckbox.disabled = true;
+        regressionWarning.style.display = 'block';
+        if (naiveBayesCheckbox.checked) {
+          naiveBayesCheckbox.checked = false;
+        }
+      } else {
+        naiveBayesCard.classList.remove('disabled');
+        naiveBayesCheckbox.disabled = false;
+        regressionWarning.style.display = 'none';
+      }
+    }
+
+    const previewTable = document.querySelector('.preview-table');
+    let columnData = {};
+    if (previewTable) {
+      const headers = Array.from(previewTable.querySelectorAll('th')).map(th => th.textContent);
+      const rows = previewTable.querySelectorAll('tbody tr');
+      headers.forEach((header, index) => {
+        columnData[header] = Array.from(rows).map(row => {
+          const cell = row.querySelectorAll('td')[index];
+          return cell ? cell.textContent : null;
+        });
+      });
+    }
+
+    targetSelect.addEventListener('change', function () {
+      const selectedColumn = this.value;
+      formTargetInput.value = selectedColumn;
+      if (!selectedColumn) {
+        targetTypeInfo.style.display = 'none';
+        submitButton.disabled = true;
+        return;
+      }
+      disableNaiveBayesIfRegression(selectedColumn);
+      submitButton.disabled = false;
+    });
+    
+    // Move selected items from available list to selected list
+    addButton.addEventListener('click', function() {
+        const selectedItems = Array.from(availableList.querySelectorAll('li.selected'));
+        selectedItems.forEach(item => {
+            item.classList.remove('selected');
+            selectedList.appendChild(item);  // Move to the selected list
+        });
+    });
+    
+    // Move selected items from selected list back to available list
+    removeButton.addEventListener('click', function() {
+        const selectedItems = Array.from(selectedList.querySelectorAll('li.selected'));
+        selectedItems.forEach(item => {
+            item.classList.remove('selected');
+            availableList.appendChild(item);  // Move back to available list
+        });
+    });
+
+    // Handle item selection and deselection
+    availableList.addEventListener('click', function(e) {
+        if (e.target.tagName === 'LI') {
+            e.target.classList.toggle('selected');
+        }
+    });
+
+    selectedList.addEventListener('click', function(e) {
+        if (e.target.tagName === 'LI') {
+            e.target.classList.toggle('selected');
+        }
+    });
+
+    // Handle the form submission
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        // Prevent the form from submitting immediately
+        e.preventDefault();
+
+        // Get the selected features from the selected list (right list)
+        const selectedFeatures = Array.from(selectedList.querySelectorAll('li')).map(function (item) {
+            return item.textContent.trim();
+        });
+
+        // Create a hidden input to store the selected features
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'selected_features'; // Same name as the form field
+        hiddenInput.value = JSON.stringify(selectedFeatures); // Store as a JSON string
+
+        // Append the hidden input to the form
+        form.appendChild(hiddenInput);
+
+        // Submit the form after appending the data
+        form.submit();
+    });
+
+        const selectedTarget = "{{ selected_target }}";  // Pass the selected target column to JS
+        const columns = JSON.parse(document.getElementById('columnsData').value);  // Pass the column names from Python
+
+    // Filter out the target column from the available features
+    const filteredColumns = columns.filter(col => col !== selectedTarget);
+
+    // Populate the available features list
+    filteredColumns.forEach(function (column) {
+        const li = document.createElement('li');
+        li.textContent = column;
+        availableList.appendChild(li);
+    });
+
+    // Handle item selection and deselection in the available features list
+    availableList.addEventListener('click', function (e) {
+        if (e.target.tagName === 'LI') {
+            e.target.classList.toggle('selected');
+        }
+    });
+
+    // Handle item selection and deselection in the selected features list
+    selectedList.addEventListener('click', function (e) {
+        if (e.target.tagName === 'LI') {
+            e.target.classList.toggle('selected');
+        }
+    });
+
+    // Move selected items from available list to selected list
+    addButton.addEventListener('click', function () {
+        const selectedItems = Array.from(availableList.querySelectorAll('li.selected'));
+        selectedItems.forEach(function (item) {
+            item.classList.remove('selected');
+            selectedList.appendChild(item);
+        });
+    });
+
+    // Move selected items from selected list back to available list
+    removeButton.addEventListener('click', function () {
+        const selectedItems = Array.from(selectedList.querySelectorAll('li.selected'));
+        selectedItems.forEach(function (item) {
+            item.classList.remove('selected');
+            availableList.appendChild(item);
+        });
+    });
+  });
+</script>
+
+
+</body>
+</html>

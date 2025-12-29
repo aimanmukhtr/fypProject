@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Your License - AI Platform</title>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-auth-compat.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<style>
+  /* Base styles and reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Color system */
+  --primary: #3B82F6;
+  --primary-dark: #2563EB;
+  --primary-light: #93C5FD;
+  --accent: #8B5CF6;
+  --accent-light: #C4B5FD;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+  
+  /* Spacing system - multiples of 8px */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  
+  /* Font sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  color: var(--gray-800);
+  background-color: var(--gray-50);
+  min-height: 100vh;
+}
+
+/* Container */
+.license-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-2);
+  position: relative;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  margin-bottom: var(--space-4);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: var(--text-xl);
+  color: var(--gray-800);
+}
+
+.logo svg {
+  margin-right: var(--space-1);
+  color: var(--primary);
+}
+
+/* Main content */
+.main-content {
+  padding: var(--space-4) 0;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: var(--space-5);
+}
+
+.page-title h1 {
+  font-size: var(--text-3xl);
+  color: var(--gray-900);
+  margin-bottom: var(--space-1);
+  font-weight: 700;
+}
+
+.page-title p {
+  font-size: var(--text-lg);
+  color: var(--gray-600);
+}
+
+/* License options */
+.license-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.license-card {
+  background-color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4);
+  border: 2px solid transparent;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.license-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.license-card.selected {
+  border-color: var(--primary);
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.license-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.license-header h2 {
+  font-size: var(--text-2xl);
+  color: var(--gray-900);
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge.premium {
+  background-color: var(--accent-light);
+  color: var(--accent);
+}
+
+.license-features {
+  margin-bottom: var(--space-3);
+}
+
+.license-features ul {
+  list-style-type: none;
+}
+
+.license-features li {
+  padding: var(--space-1) 0;
+  position: relative;
+  padding-left: 28px;
+  color: var(--gray-700);
+}
+
+.license-features li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2310B981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.license-features li.unavailable {
+  color: var(--gray-400);
+}
+
+.license-features li.unavailable::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+}
+
+.license-select {
+  margin-top: var(--space-3);
+}
+
+.license-select input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.license-select label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.radio-custom {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--gray-300);
+  border-radius: 50%;
+  margin-right: 8px;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.radio-custom::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  transition: all var(--transition-fast);
+}
+
+input[type="radio"]:checked + label .radio-custom {
+  border-color: var(--primary);
+}
+
+input[type="radio"]:checked + label .radio-custom::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Form actions */
+.form-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.submit-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.submit-btn svg {
+  transition: transform var(--transition-fast);
+}
+
+.submit-btn:hover svg {
+  transform: translateX(4px);
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid var(--gray-200);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (min-width: 768px) {
+  .license-options {
+    flex-direction: row;
+  }
+  
+  .license-card {
+    flex: 1;
+  }
+  
+  .submit-btn {
+    padding: 14px 32px;
+    font-size: var(--text-lg);
+  }
+}
+
+@media (max-width: 767px) {
+  .page-title h1 {
+    font-size: var(--text-2xl);
+  }
+  
+  .page-title p {
+    font-size: var(--text-base);
+  }
+  
+  .license-header h2 {
+    font-size: var(--text-xl);
+  }
+}
+
+/* Animation for selection */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+.license-card.selected {
+  animation: pulse 1s;
+}
+</style>
+<body>
+  <div class="license-container">
+    <header class="header">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers">
+          <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+          <path d="m22 12-8.58 3.91a2 2 0 0 1-1.66 0L2.99 12"/>
+          <path d="m22 17-8.58 3.91a2 2 0 0 1-1.66 0L2.99 17"/>
+        </svg>
+        <span>AI Platform</span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="page-title">
+        <h1>Choose Your License</h1>
+        <p>Select the license type that fits your needs</p>
+      </div>
+
+      <form id="licenseForm" action="javascript:void(0);" method="POST">
+        <input type="hidden" id="uid" name="uid" value="">
+        
+        <div class="license-options">
+          <div class="license-card" data-license="1">
+            <div class="license-header">
+              <h2>Normal License</h2>
+              <div class="badge">Popular</div>
+            </div>
+            <div class="price-display">
+              <span class="price">RM10</span>
+              <span class="billing-period">/month</span>
+            </div>
+            <div class="license-features">
+              <ul>
+                <li>Access to core AI features</li>
+                <li>Standard model training</li>
+                <li>Basic data visualization</li>
+                <li class="unavailable">GP-AutoML functionality</li>
+                <li class="unavailable">TPOT automated ML</li>
+              </ul>
+            </div>
+            <div class="license-select">
+              <input type="radio" id="normal" name="license_type_id" value="1" checked>
+              <label for="normal">
+                <span class="radio-custom"></span>
+                <span>Select Normal</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="license-card" data-license="2">
+            <div class="license-header">
+              <h2>Advanced License</h2>
+              <div class="badge premium">Premium</div>
+            </div>
+            <div class="price-display">
+              <span class="price">RM15</span>
+              <span class="billing-period">/month</span>
+            </div>
+            <div class="license-features">
+              <ul>
+                <li>Access to ALL AI features</li>
+                <li>Advanced model training</li>
+                <li>Enhanced data visualization</li>
+                <li>GP-AutoML functionality</li>
+                <li>TPOT automated ML</li>
+              </ul>
+            </div>
+            <div class="license-select">
+              <input type="radio" id="advanced" name="license_type_id" value="2">
+              <label for="advanced">
+                <span class="radio-custom"></span>
+                <span>Select Advanced</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="submitBtn" class="submit-btn">
+            <span>Continue</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loader"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDutZ9Ue_wOmtvXUHrJuWuTplCFGfrvoLM",
+      authDomain: "fypautoml.firebaseapp.com",
+      projectId: "fypautoml",
+      storageBucket: "fypautoml.firebasestorage.app",
+      messagingSenderId: "945914686130",
+      appId: "1:945914686130:web:ea30eab865086e1bff77ab",
+      measurementId: "G-D0XJLZ2HXX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const firestore = getFirestore(app);
+    const storage = getStorage(app);
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        console.log('User is signed in:', user);
+      } else {
+        console.log('No user is signed in');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      const uidInput = document.getElementById('uid');
+
+      loadingOverlay.style.display = 'flex';
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          uidInput.value = user.uid;
+          loadingOverlay.style.display = 'none';
+        } else {
+          window.location.href = '/register';
+        }
+      }, (error) => {
+        console.error('Auth state change error:', error);
+        loadingOverlay.style.display = 'none';
+        alert('Authentication error. Please try logging in again.');
+        window.location.href = '/register';
+      });
+
+      document.querySelectorAll('.license-card').forEach(card => {
+        card.addEventListener('click', function() {
+          const licenseId = this.getAttribute('data-license');
+          const radioInput = document.querySelector(`input[value="${licenseId}"]`);
+          
+          radioInput.checked = true;
+          
+          // Remove selected class from all cards
+          document.querySelectorAll('.license-card').forEach(c => {
+            c.classList.remove('selected');
+          });
+          
+          // Add selected class to clicked card
+          this.classList.add('selected');
+        });
+      });
+
+      document.getElementById('licenseForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const uid = document.getElementById('uid').value;
+        const license_type = document.querySelector('input[name="license_type_id"]:checked').value;
+        
+        if (!uid) {
+          event.preventDefault();
+          alert('Please ensure you are logged in before selecting a license.');
+          window.location.href = '/register';
+          return;
+        }
+
+        // Show loading overlay while processing
+        loadingOverlay.style.display = 'flex';
+        
+        try {
+          // Request the backend to create a Stripe Checkout session
+          const response = await fetch('/create-checkout-session', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uid, license_type }),
+            credentials: 'include'
+          });
+
+          const session = await response.json();
+
+          // Check for errors from the backend
+          if (session.error) {
+            alert('Error: ' + session.error);
+            loadingOverlay.style.display = 'none';
+            return;
+          }
+
+          // Redirect to Stripe Checkout page
+          const stripe = Stripe('pk_test_51RSADZIEZSCBrBXvDAMsUGgakW1Cp7M8UcCdJSrJEt9Z9Rhb85UpsAcubR9EnuYW4psUVHQfDUoW247RtXaBt49c00eT1WjwJ8'); // Replace with your actual Stripe public key
+          const result = await stripe.redirectToCheckout({
+            sessionId: session.id
+          });
+
+          if (result.error) {
+            alert(result.error.message);
+          }
+        } catch (err) {
+          alert('Failed to create checkout session: ' + err.message);
+          loadingOverlay.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
