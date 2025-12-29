@@ -53,7 +53,7 @@ Session(app)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # 🔵 Initialize Firebase Admin SDK (use your own serviceAccountKey.json)
-cred = credentials.Certificate("C:\\Users\\User\\testingFyp\\venv\\static\\firebase_key.json")
+cred = credentials.Certificate("C:\\Users\\User\\testingFyp\\firebase_key.json")
 firebase_admin.initialize_app(cred, {
     'storageBucket': "fypautoml.firebasestorage.app",
     'projectId': "fypautoml"
@@ -62,8 +62,8 @@ firebase_admin.initialize_app(cred, {
 db = firestore.client()
 bucket = storage.bucket()
 
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY)
-stripe_webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY', 'sk_test_51RSADZIEZSCBrBXvwlRklvjYUAXqfgKGxX6y02Y8Uzihwr0k7myIwlVV9gwQCFEFMWOI8ahGaiEK7mkBuNRf9H5H00vjcHSPKV')
+stripe_webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET', 'whsec_Z0QgZ3Ck7bgf4Vs9KcKOYEzkMd9AgZ29')
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'pdf'}
 
