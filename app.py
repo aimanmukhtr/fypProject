@@ -53,10 +53,11 @@ Session(app)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # 🔵 Initialize Firebase Admin SDK (use your own serviceAccountKey.json)
-cred = credentials.Certificate("C:\\Users\\User\\testingFyp\\firebase_key.json")
+firebase_key_path = os.getenv("FIREBASE_KEY_PATH", "/etc/secrets/firebase_key.json")
+cred = credentials.Certificate(firebase_key_path)
 firebase_admin.initialize_app(cred, {
-    'storageBucket': "fypautoml.firebasestorage.app",
-    'projectId': "fypautoml"
+    'storageBucket': os.getenv("FIREBASE_STORAGE_BUCKET", "fypautoml.firebasestorage.app"),
+    'projectId': os.getenv("FIREBASE_PROJECT_ID", "fypautoml")
 })
 
 db = firestore.client()
