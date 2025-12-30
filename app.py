@@ -455,8 +455,8 @@ def create_checkout_session():
                 'quantity': 1, 
             }],
             mode='subscription',
-            success_url=f"https://3dfbc261d642.ngrok-free.app/payment-success?session_id={{CHECKOUT_SESSION_ID}}&uid={uid}&license_type={license_type}",
-            cancel_url="https://3dfbc261d642.ngrok-free.app/payment-cancelled", 
+            success_url=f"https://gp-project-hdkx.onrender.com/payment-success?session_id={{CHECKOUT_SESSION_ID}}&uid={uid}&license_type={license_type}",
+            cancel_url="https://gp-project-hdkx.onrender.com/payment-cancelled",
             metadata={
                 'uid': uid,
                 'license_type': license_type,
