@@ -398,7 +398,7 @@ li:hover {
     const naiveBayesCard = document.getElementById('naiveBayesCard');
     const naiveBayesCheckbox = document.getElementById('naiveBayesCheckbox');
     const regressionWarning = document.querySelector('#naiveBayesCard .regression-warning');
-    const userLicenseType = JSON.parse('{{ license_type | default(1) }}');
+    const userLicenseType = Number({{ license_type | default(1) | tojson }});
     const addButton = document.getElementById('addButton');
     const removeButton = document.getElementById('removeButton');
     const availableList = document.getElementById('availableFeatures');

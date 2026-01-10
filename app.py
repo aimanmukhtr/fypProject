@@ -881,6 +881,8 @@ def index():
 
             session['filename'] = filename
             license_type = session.get('license_type')
+            if license_type is None:
+                license_type = session.get('license_type_id', 1)
 
             
             try:
