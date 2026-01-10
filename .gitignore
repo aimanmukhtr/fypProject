@@ -71,3 +71,8 @@ node_modules/
 firebase_key.json
 *.json
 
+venv/
+__pycache__/
+*.pyc
+.env
+firebase_key.json

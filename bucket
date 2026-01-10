@@ -1,0 +1,29 @@
+[1mdiff --git a/.gitignore b/.gitignore[m
+[1mindex 2ed6f81..c8f4122 100644[m
+[1m--- a/.gitignore[m
+[1m+++ b/.gitignore[m
+[36m@@ -68,5 +68,6 @@[m [mnode_modules/[m
+ # dataconnect generated files[m
+ .dataconnect[m
+ [m
+[31m-[m
+ firebase_key.json[m
+[32m+[m[32m*.json[m
+[41m+[m
+[1mdiff --git a/app.py b/app.py[m
+[1mindex 71b7c75..c9d81fc 100644[m
+[1m--- a/app.py[m
+[1m+++ b/app.py[m
+[36m@@ -821,9 +821,9 @@[m [mdef get_receipt_url(uid):[m
+             return jsonify({'error': 'Receipt file name not found.'}), 404[m
+ [m
+         # Generate signed URL using Google Cloud Storage[m
+[31m-        gcs_client = gcs_storage.Client.from_service_account_json([m
+[31m-            "firebase_key.json"[m
+[31m-        )[m
+[32m+[m[32m        firebase_key_path = os.getenv("FIREBASE_KEY_PATH", "/etc/secrets/firebase_key.json")[m
+[32m+[m[32m        gcs_client = gcs_storage.Client.from_service_account_json(firebase_key_path)[m
+[32m+[m
+         bucket = gcs_client.bucket('fypautoml.firebasestorage.app')  # ✅ Use the correct bucket name[m
+         blob = bucket.blob(f'receipts/{file_name}')[m
+         print(f"Checking blob: receipts/{file_name}")[m
