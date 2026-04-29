@@ -76,6 +76,29 @@ def allowed_dataset_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+def resolve_current_license_type():
+    """Get the user's current license from Firestore first, then session as backup."""
+    uid = session.get('uid') or session.get('user_id')
+    if uid:
+        try:
+            user_doc = db.collection('Users').document(uid).get()
+            if user_doc.exists:
+                license_type = user_doc.to_dict().get('license_type')
+                if license_type is not None:
+                    return int(license_type)
+        except Exception as e:
+            print(f"Could not fetch license_type from Firestore for {uid}: {e}")
+
+    session_license = session.get('license_type')
+    if session_license is not None:
+        return int(session_license)
+
+    session_license_id = session.get('license_type_id')
+    if session_license_id is not None:
+        return int(session_license_id)
+
+    return None
+
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
@@ -880,10 +903,7 @@ def index():
 
 
             session['filename'] = filename
-            license_type = session.get('license_type')
-            if license_type is None:
-                license_type = session.get('license_type_id', 1)
-
+            license_type = resolve_current_license_type()
             
             try:
                 data = pd.read_csv(filepath)
@@ -928,7 +948,7 @@ def select_target():
             selected_target = session.get('target_column', '')
             selected_algorithms = session.get('selected_algorithms', [])
             selected_features = session.get('selected_features', [])
-            license_type = session.get('license_type')
+            license_type = resolve_current_license_type()
             
             return render_template('select_target.html',
                                 filename=session['filename'],
@@ -965,6 +985,7 @@ def select_target():
             return redirect(url_for('select_target'))
         
         selected_features = json.loads(selected_features)
+        selected_features = [feature for feature in selected_features if feature != target_column]
 
         # Store selections in session
         session['target_column'] = target_column

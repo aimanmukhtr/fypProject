@@ -398,11 +398,14 @@ li:hover {
     const naiveBayesCard = document.getElementById('naiveBayesCard');
     const naiveBayesCheckbox = document.getElementById('naiveBayesCheckbox');
     const regressionWarning = document.querySelector('#naiveBayesCard .regression-warning');
-    const userLicenseType = Number({{ license_type | default(1) | tojson }});
+    const userLicenseType = Number({{ license_type | default(0) | tojson }});
     const addButton = document.getElementById('addButton');
     const removeButton = document.getElementById('removeButton');
     const availableList = document.getElementById('availableFeatures');
     const selectedList = document.getElementById('selectedFeatures');
+    const allColumns = JSON.parse(document.getElementById('columnsData').value);
+    const initialSelectedTarget = "{{ selected_target }}";
+    const initiallySelectedFeatures = {{ selected_features | default([], true) | tojson }};
     const automlCards = document.querySelectorAll('.automl-card');  // All AutoML cards (TPOT)
     const cells = document.querySelectorAll('.correlation-matrix td'); // Select all table cells
 
@@ -429,7 +432,7 @@ li:hover {
 
 
     function enforceLicenseRestrictions(userLicenseType) {
-      if (userLicenseType == 1) {
+      if (userLicenseType !== 2) {
             // Disable AutoML (TPOT) for basic license (license type 1)
             automlCards.forEach(card => {
                 const checkbox = card.querySelector('input[type="checkbox"]');
@@ -500,16 +503,38 @@ li:hover {
       });
     }
 
+    function refreshFeatureLists(selectedColumn) {
+        const selectedValues = Array.from(selectedList.querySelectorAll('li')).map(li => li.textContent.trim());
+        const nextSelected = selectedValues.filter(feature => feature !== selectedColumn);
+        const nextAvailable = allColumns.filter(col => col !== selectedColumn && !nextSelected.includes(col));
+
+        availableList.innerHTML = '';
+        selectedList.innerHTML = '';
+
+        nextAvailable.forEach(feature => {
+            const li = document.createElement('li');
+            li.textContent = feature;
+            availableList.appendChild(li);
+        });
+
+        nextSelected.forEach(feature => {
+            const li = document.createElement('li');
+            li.textContent = feature;
+            selectedList.appendChild(li);
+        });
+    }
+
     targetSelect.addEventListener('change', function () {
       const selectedColumn = this.value;
-      formTargetInput.value = selectedColumn;
-      if (!selectedColumn) {
-        targetTypeInfo.style.display = 'none';
-        submitButton.disabled = true;
-        return;
-      }
-      disableNaiveBayesIfRegression(selectedColumn);
-      submitButton.disabled = false;
+        formTargetInput.value = selectedColumn;
+        refreshFeatureLists(selectedColumn);
+        if (!selectedColumn) {
+            targetTypeInfo.style.display = 'none';
+            submitButton.disabled = true;
+            return;
+        }
+        disableNaiveBayesIfRegression(selectedColumn);
+        submitButton.disabled = false;
     });
     
     // Move selected items from available list to selected list
@@ -567,51 +592,24 @@ li:hover {
         form.submit();
     });
 
-        const selectedTarget = "{{ selected_target }}";  // Pass the selected target column to JS
-        const columns = JSON.parse(document.getElementById('columnsData').value);  // Pass the column names from Python
-
-    // Filter out the target column from the available features
-    const filteredColumns = columns.filter(col => col !== selectedTarget);
-
-    // Populate the available features list
-    filteredColumns.forEach(function (column) {
+    const initialTarget = targetSelect.value || initialSelectedTarget || '';
+    const sanitizedInitialSelected = initiallySelectedFeatures.filter(feature => feature !== initialTarget);
+    selectedList.innerHTML = '';
+    sanitizedInitialSelected.forEach(feature => {
         const li = document.createElement('li');
-        li.textContent = column;
-        availableList.appendChild(li);
+        li.textContent = feature;
+        selectedList.appendChild(li);
     });
-
-    // Handle item selection and deselection in the available features list
-    availableList.addEventListener('click', function (e) {
-        if (e.target.tagName === 'LI') {
-            e.target.classList.toggle('selected');
-        }
-    });
-
-    // Handle item selection and deselection in the selected features list
-    selectedList.addEventListener('click', function (e) {
-        if (e.target.tagName === 'LI') {
-            e.target.classList.toggle('selected');
-        }
-    });
-
-    // Move selected items from available list to selected list
-    addButton.addEventListener('click', function () {
-        const selectedItems = Array.from(availableList.querySelectorAll('li.selected'));
-        selectedItems.forEach(function (item) {
-            item.classList.remove('selected');
-            selectedList.appendChild(item);
-        });
-    });
-
-    // Move selected items from selected list back to available list
-    removeButton.addEventListener('click', function () {
-        const selectedItems = Array.from(selectedList.querySelectorAll('li.selected'));
-        selectedItems.forEach(function (item) {
-            item.classList.remove('selected');
-            availableList.appendChild(item);
-        });
-    });
-  });
+    refreshFeatureLists(initialTarget);
+    if (initialTarget) {
+        formTargetInput.value = initialTarget;
+        disableNaiveBayesIfRegression(initialTarget);
+        submitButton.disabled = false;
+    } else {
+        submitButton.disabled = true;
+    }
+    
+});
 </script>
 
 
