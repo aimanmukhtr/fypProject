@@ -295,7 +295,9 @@ li:hover {
         {% endif %}
 
         <!-- Dual List Box (Feature Selector) -->
-        <input type="hidden" id="columnsData" value="{{ columns | tojson }}">
+        <script id="columnsData" type="application/json">
+            {{ columns | tojson | safe }}
+        </script>
         <div class="dual-list-container">
             <h2>2. Select Features</h2>
             <p>Choose features to include in model training by moving them to the right.</p>
@@ -303,19 +305,13 @@ li:hover {
                 <!-- Available Features List -->
                 <div class="list-container">
                     <h3>Available Features</h3>
-                    <ul id="availableFeatures">
-                        {% for column in columns %}
-                            {% if column != selected_target %}  <!-- Exclude the target column -->
-                                <li>{{ column }}</li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
+                    <ul id="availableFeatures"></ul>
                 </div>
 
                 <!-- Actions (Add/Remove buttons) -->
                 <div class="actions">
-                    <button id="addButton" class="action-btn">Add →</button>
-                    <button id="removeButton" class="action-btn">← Remove</button>
+                    <button type="button" id="addButton" class="action-btn">Add →</button>
+                    <button type="button"id="removeButton" class="action-btn">← Remove</button>
                 </div>
 
                 <!-- Selected Features List -->
@@ -328,7 +324,7 @@ li:hover {
             </div>
         </div>
 
-        <form method="POST" action="{{ url_for('select_target') }}">
+        <form id="targetForm" method="POST" action="{{ url_for('select_target') }}">
             <input type="hidden" name="target_column" id="formTargetColumn" value="{{ session.get('target_column', '') }}">
             
             <div class="algorithm-selection">
@@ -388,227 +384,176 @@ li:hover {
         </form>
     </div>
 
-    <script>
-  document.addEventListener('DOMContentLoaded', function() {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
     const targetSelect = document.getElementById('targetColumn');
     const formTargetInput = document.getElementById('formTargetColumn');
-    const taskTypeDisplay = document.getElementById('taskTypeDisplay');
-    const targetTypeInfo = document.getElementById('targetTypeInfo');
-    const submitButton = document.getElementById('submitButton');
-    const naiveBayesCard = document.getElementById('naiveBayesCard');
-    const naiveBayesCheckbox = document.getElementById('naiveBayesCheckbox');
-    const regressionWarning = document.querySelector('#naiveBayesCard .regression-warning');
-    const userLicenseType = Number({{ license_type | default(0) | tojson }});
-    const addButton = document.getElementById('addButton');
-    const removeButton = document.getElementById('removeButton');
     const availableList = document.getElementById('availableFeatures');
     const selectedList = document.getElementById('selectedFeatures');
-    const allColumns = JSON.parse(document.getElementById('columnsData').value);
-    const initialSelectedTarget = "{{ selected_target }}";
-    const initiallySelectedFeatures = {{ selected_features | default([], true) | tojson }};
-    const automlCards = document.querySelectorAll('.automl-card');  // All AutoML cards (TPOT)
-    const cells = document.querySelectorAll('.correlation-matrix td'); // Select all table cells
-
-    cells.forEach((cell, index) => {
-    let value = parseFloat(cell.innerText); // Get the value from the cell
-    const numColumns = document.querySelectorAll('.correlation-matrix th').length; // Get the number of columns
-    const row = Math.floor(index / numColumns); // Determine row index
-    const col = numColumns % index; // Determine column index
-
-    if (row === col) {
-        cell.classList.add('diagonal');  // Add special class to diagonal cells
-        return; // **Skip** the rest of the logic for diagonal cells, don't add "positive" or "negative"
-    }
-
-    // Apply different color classes based on the value for non-diagonal cells
-    if (value > 0.5) {
-        cell.classList.add('positive');
-    } else if (value < -0.5) {
-        cell.classList.add('negative');
-    } else {
-        cell.classList.add('neutral');
-    }
-});
-
-
-    function enforceLicenseRestrictions(userLicenseType) {
-      if (userLicenseType !== 2) {
-            // Disable AutoML (TPOT) for basic license (license type 1)
-            automlCards.forEach(card => {
-                const checkbox = card.querySelector('input[type="checkbox"]');
-                if (checkbox) {
-                    checkbox.disabled = true;
-                    checkbox.checked = false;  // Uncheck the checkbox
-                }
-                card.classList.add('disabled');  // Apply disabled styling
-            });
-        } else if (userLicenseType == 2) {
-            // Enable AutoML (TPOT) for advanced license (license type 2)
-            automlCards.forEach(card => {
-                const checkbox = card.querySelector('input[type="checkbox"]');
-                if (checkbox) {
-                    checkbox.disabled = false;  // Enable the checkbox
-                }
-                card.classList.remove('disabled');  // Remove disabled styling
-            });
-        }
-    }
-
-    enforceLicenseRestrictions(userLicenseType);
-
-
-    function disableNaiveBayesIfRegression(targetCol) {
-      const sampleValues = columnData[targetCol] || [];
-      let isNumeric = sampleValues.every(val => !isNaN(val) && val !== '');
-      let uniqueValues = Array.from(new Set(sampleValues.map(val => parseFloat(val))));
-      let isClassification = false;
-
-      if (isNumeric) {
-        let allIntegers = uniqueValues.every(v => Number.isInteger(v));
-        if (uniqueValues.length <= 15 && allIntegers) {
-          isClassification = true;
-        }
-      } else {
-        isClassification = true;
-      }
-
-      const taskType = isClassification ? 'Classification' : 'Regression';
-      taskTypeDisplay.textContent = taskType;
-      targetTypeInfo.style.display = 'block';
-
-      if (!isClassification) {
-        naiveBayesCard.classList.add('disabled');
-        naiveBayesCheckbox.disabled = true;
-        regressionWarning.style.display = 'block';
-        if (naiveBayesCheckbox.checked) {
-          naiveBayesCheckbox.checked = false;
-        }
-      } else {
-        naiveBayesCard.classList.remove('disabled');
-        naiveBayesCheckbox.disabled = false;
-        regressionWarning.style.display = 'none';
-      }
-    }
+    const addButton = document.getElementById('addButton');
+    const removeButton = document.getElementById('removeButton');
+    const form = document.getElementById('targetForm');
+    const columns = JSON.parse(document.getElementById('columnsData').textContent);
+    const userLicenseType = Number('{{ license_type | default(1) }}');
+    const taskTypeDisplay = document.getElementById('taskTypeDisplay');
+    const targetTypeInfo = document.getElementById('targetTypeInfo');
 
     const previewTable = document.querySelector('.preview-table');
     let columnData = {};
+    const automlCards = document.querySelectorAll('.automl-card');
+
     if (previewTable) {
-      const headers = Array.from(previewTable.querySelectorAll('th')).map(th => th.textContent);
-      const rows = previewTable.querySelectorAll('tbody tr');
-      headers.forEach((header, index) => {
-        columnData[header] = Array.from(rows).map(row => {
-          const cell = row.querySelectorAll('td')[index];
-          return cell ? cell.textContent : null;
+        const headers = Array.from(previewTable.querySelectorAll('th')).map(th => th.textContent.trim());
+        const rows = previewTable.querySelectorAll('tbody tr');
+
+        headers.forEach((header, index) => {
+            columnData[header] = Array.from(rows).map(row => {
+                const cell = row.querySelectorAll('td')[index];
+                return cell ? cell.textContent.trim() : '';
+            });
         });
-      });
     }
 
-    function refreshFeatureLists(selectedColumn) {
-        const selectedValues = Array.from(selectedList.querySelectorAll('li')).map(li => li.textContent.trim());
-        const nextSelected = selectedValues.filter(feature => feature !== selectedColumn);
-        const nextAvailable = allColumns.filter(col => col !== selectedColumn && !nextSelected.includes(col));
+    function enforceLicenseRestrictions() {
+        automlCards.forEach(card => {
+            const checkbox = card.querySelector('input[type="checkbox"]');
 
+            if (userLicenseType === 1) {
+                checkbox.disabled = true;
+                checkbox.checked = false;
+                card.classList.add('disabled');
+            } else {
+                checkbox.disabled = false;
+                card.classList.remove('disabled');
+            }
+        });
+    }
+
+    function rebuildFeatureLists(targetColumn) {
         availableList.innerHTML = '';
         selectedList.innerHTML = '';
 
-        nextAvailable.forEach(feature => {
-            const li = document.createElement('li');
-            li.textContent = feature;
-            availableList.appendChild(li);
-        });
-
-        nextSelected.forEach(feature => {
-            const li = document.createElement('li');
-            li.textContent = feature;
-            selectedList.appendChild(li);
+        columns.forEach(column => {
+            if (column !== targetColumn) {
+                const li = document.createElement('li');
+                li.textContent = column;
+                availableList.appendChild(li);
+            }
         });
     }
+
+    function toggleSelected(e) {
+        if (e.target.tagName === 'LI') {
+            e.target.classList.toggle('selected');
+        }
+    }
+
+    availableList.addEventListener('click', toggleSelected);
+    selectedList.addEventListener('click', toggleSelected);
+
+    addButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        availableList.querySelectorAll('li.selected').forEach(item => {
+            item.classList.remove('selected');
+            selectedList.appendChild(item);
+        });
+    });
+
+    removeButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        selectedList.querySelectorAll('li.selected').forEach(item => {
+            item.classList.remove('selected');
+            availableList.appendChild(item);
+        });
+    });
 
     targetSelect.addEventListener('change', function () {
-      const selectedColumn = this.value;
-        formTargetInput.value = selectedColumn;
-        refreshFeatureLists(selectedColumn);
-        if (!selectedColumn) {
+        const targetColumn = this.value;
+        formTargetInput.value = targetColumn;
+        rebuildFeatureLists(targetColumn);
+
+        if (!targetColumn) {
             targetTypeInfo.style.display = 'none';
-            submitButton.disabled = true;
             return;
         }
-        disableNaiveBayesIfRegression(selectedColumn);
-        submitButton.disabled = false;
-    });
-    
-    // Move selected items from available list to selected list
-    addButton.addEventListener('click', function() {
-        const selectedItems = Array.from(availableList.querySelectorAll('li.selected'));
-        selectedItems.forEach(item => {
-            item.classList.remove('selected');
-            selectedList.appendChild(item);  // Move to the selected list
-        });
-    });
-    
-    // Move selected items from selected list back to available list
-    removeButton.addEventListener('click', function() {
-        const selectedItems = Array.from(selectedList.querySelectorAll('li.selected'));
-        selectedItems.forEach(item => {
-            item.classList.remove('selected');
-            availableList.appendChild(item);  // Move back to available list
-        });
-    });
 
-    // Handle item selection and deselection
-    availableList.addEventListener('click', function(e) {
-        if (e.target.tagName === 'LI') {
-            e.target.classList.toggle('selected');
+        const values = columnData[targetColumn] || [];
+        const cleanedValues = values
+            .map(v => String(v).trim())
+            .filter(v => v !== '');
+
+        const uniqueValues = [...new Set(cleanedValues)];
+        const allNumeric = cleanedValues.every(v => !isNaN(Number(v)));
+
+        let taskType;
+
+        if (!allNumeric) {
+            taskType = 'Classification';
+        } else if (uniqueValues.length <= 15 && cleanedValues.every(v => Number.isInteger(Number(v)))) {
+            taskType = 'Classification';
+        } else {
+            taskType = 'Regression';
         }
+
+        taskTypeDisplay.textContent = taskType;
+        targetTypeInfo.style.display = 'block';
     });
 
-    selectedList.addEventListener('click', function(e) {
-        if (e.target.tagName === 'LI') {
-            e.target.classList.toggle('selected');
+    form.addEventListener('submit', function (e) {
+        const targetColumn = targetSelect.value;
+
+        if (!targetColumn) {
+            e.preventDefault();
+            alert('Please select a target column.');
+            return;
         }
-    });
 
-    // Handle the form submission
-    const form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
-        // Prevent the form from submitting immediately
-        e.preventDefault();
+        const selectedFeatures = Array.from(selectedList.querySelectorAll('li'))
+            .map(item => item.textContent.trim())
+            .filter(feature => feature !== targetColumn);
 
-        // Get the selected features from the selected list (right list)
-        const selectedFeatures = Array.from(selectedList.querySelectorAll('li')).map(function (item) {
-            return item.textContent.trim();
-        });
+        if (selectedFeatures.length === 0) {
+            e.preventDefault();
+            alert('Please select at least one feature.');
+            return;
+        }
 
-        // Create a hidden input to store the selected features
-        const hiddenInput = document.createElement('input');
+        let hiddenInput = document.getElementById('selectedFeaturesInput');
+        if (hiddenInput) {
+            hiddenInput.remove();
+        }
+
+        hiddenInput = document.createElement('input');
         hiddenInput.type = 'hidden';
-        hiddenInput.name = 'selected_features'; // Same name as the form field
-        hiddenInput.value = JSON.stringify(selectedFeatures); // Store as a JSON string
+        hiddenInput.name = 'selected_features';
+        hiddenInput.id = 'selectedFeaturesInput';
+        hiddenInput.value = JSON.stringify(selectedFeatures);
 
-        // Append the hidden input to the form
         form.appendChild(hiddenInput);
 
-        // Submit the form after appending the data
-        form.submit();
+        console.log("Submitting selected features:", selectedFeatures);
     });
 
-    const initialTarget = targetSelect.value || initialSelectedTarget || '';
-    const sanitizedInitialSelected = initiallySelectedFeatures.filter(feature => feature !== initialTarget);
-    selectedList.innerHTML = '';
-    sanitizedInitialSelected.forEach(feature => {
-        const li = document.createElement('li');
-        li.textContent = feature;
-        selectedList.appendChild(li);
-    });
-    refreshFeatureLists(initialTarget);
-    if (initialTarget) {
-        formTargetInput.value = initialTarget;
-        disableNaiveBayesIfRegression(initialTarget);
-        submitButton.disabled = false;
-    } else {
-        submitButton.disabled = true;
+    enforceLicenseRestrictions();
+
+    if (targetSelect.value) {
+        formTargetInput.value = targetSelect.value;
+        rebuildFeatureLists(targetSelect.value);
     }
-    
+
+    document.querySelectorAll('.correlation-matrix tbody tr').forEach((row, rowIndex) => {
+        row.querySelectorAll('td').forEach((cell, colIndex) => {
+            const value = parseFloat(cell.textContent);
+
+            if (rowIndex === colIndex) {
+                cell.classList.add('diagonal');
+            } else if (!isNaN(value) && value > 0.5) {
+                cell.classList.add('positive');
+            } else if (!isNaN(value) && value < -0.5) {
+                cell.classList.add('negative');
+            }
+        });
+    });
 });
 </script>
 

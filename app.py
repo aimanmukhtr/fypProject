@@ -53,7 +53,7 @@ Session(app)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # 🔵 Initialize Firebase Admin SDK (use your own serviceAccountKey.json)
-firebase_key_path = os.getenv("FIREBASE_KEY_PATH", "/etc/secrets/firebase_key.json")
+firebase_key_path = os.getenv("FIREBASE_KEY_PATH", "firebase_key.json")
 cred = credentials.Certificate(firebase_key_path)
 firebase_admin.initialize_app(cred, {
     'storageBucket': os.getenv("FIREBASE_STORAGE_BUCKET", "fypautoml.firebasestorage.app"),
@@ -75,29 +75,6 @@ def allowed_file(filename):
 def allowed_dataset_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
-def resolve_current_license_type():
-    """Get the user's current license from Firestore first, then session as backup."""
-    uid = session.get('uid') or session.get('user_id')
-    if uid:
-        try:
-            user_doc = db.collection('Users').document(uid).get()
-            if user_doc.exists:
-                license_type = user_doc.to_dict().get('license_type')
-                if license_type is not None:
-                    return int(license_type)
-        except Exception as e:
-            print(f"Could not fetch license_type from Firestore for {uid}: {e}")
-
-    session_license = session.get('license_type')
-    if session_license is not None:
-        return int(session_license)
-
-    session_license_id = session.get('license_type_id')
-    if session_license_id is not None:
-        return int(session_license_id)
-
-    return None
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -903,10 +880,14 @@ def index():
 
 
             session['filename'] = filename
-            license_type = resolve_current_license_type()
+            license_type = session.get('license_type')
+            if license_type is None:
+                license_type = session.get('license_type_id', 1)
+
             
             try:
                 data = pd.read_csv(filepath)
+                data.columns = data.columns.str.strip()
                 columns = data.columns.tolist()
                 preview = data.head(5).to_html(classes='preview-table', index=False)
                 numeric_data = data.select_dtypes(include=['number'])
@@ -939,6 +920,7 @@ def select_target():
         try:
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], session['filename'])
             data = pd.read_csv(filepath)
+            data.columns = data.columns.str.strip()
             columns = data.columns.tolist()
             preview = data.head(5).to_html(classes='preview-table', index=False)
             numeric_data = data.select_dtypes(include=['number'])
@@ -948,7 +930,7 @@ def select_target():
             selected_target = session.get('target_column', '')
             selected_algorithms = session.get('selected_algorithms', [])
             selected_features = session.get('selected_features', [])
-            license_type = resolve_current_license_type()
+            license_type = session.get('license_type')
             
             return render_template('select_target.html',
                                 filename=session['filename'],
@@ -974,6 +956,12 @@ def select_target():
             return redirect(url_for('select_target'))
         
         selected_algorithms = request.form.getlist('algorithms')
+
+        license_type = str(session.get('license_type') or session.get('license_type_id') or '1')
+
+        if license_type == '1' and 'tpot' in selected_algorithms:
+            selected_algorithms.remove('tpot')
+
         if not selected_algorithms:
             flash('Please select at least one algorithm')
             return redirect(url_for('select_target'))
@@ -985,7 +973,6 @@ def select_target():
             return redirect(url_for('select_target'))
         
         selected_features = json.loads(selected_features)
-        selected_features = [feature for feature in selected_features if feature != target_column]
 
         # Store selections in session
         session['target_column'] = target_column
@@ -996,6 +983,7 @@ def select_target():
         try:
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], session['filename'])
             data = pd.read_csv(filepath)
+            data.columns = data.columns.str.strip()
             y = data[target_column]
             session['task_type'] = detect_task_type(y)
         except Exception as e:
@@ -1101,11 +1089,18 @@ def results():
     
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     data = pd.read_csv(filepath)
+    data.columns = data.columns.str.strip()
 
     if selected_features:
         # Make sure selected features exist in the dataset
+        print("=== RESULTS DEBUG ===")
+        print("filename:", filename)
+        print("target_column:", target_column)
+        print("selected_features:", selected_features)
+        print("data columns:", data.columns.tolist())
         missing_features = [feature for feature in selected_features if feature not in data.columns]
         if missing_features:
+            print("MISSING FEATURES:", missing_features)
             flash(f"The following features are missing from the dataset: {', '.join(missing_features)}")
             return redirect(url_for('select_target'))
         data = data[selected_features + [target_column]]
@@ -1130,6 +1125,14 @@ def results():
 
     task_type = detect_task_type(y)
     session['task_type'] = task_type
+
+    if task_type == 'classification':
+        min_class_count = y.value_counts().min()
+        safe_cv = max(2, min(parameters['cv_value'], int(min_class_count)))
+        parameters['cv_value'] = safe_cv
+
+        if parameters.get('tpot'):
+            parameters['tpot']['cv'] = max(2, min(parameters['tpot']['cv'], int(min_class_count)))
 
     results = {}
     feature_importance_plots = {}
@@ -1209,9 +1212,18 @@ def results():
                     early_stop=5,
                     max_eval_time_mins=5
                 )
-                y_encoded = LabelEncoder().fit_transform(y) if y.dtype == object else y
+                le = LabelEncoder()
+                y_encoded = le.fit_transform(y.astype(str)) if task_type == 'classification' else y
 
                 start_time = time.time()
+                print("=== TPOT DEBUG ===")
+                print("task_type:", task_type)
+                print("X shape:", X.shape)
+                print("y classes/counts:")
+                print(pd.Series(y_encoded).value_counts())
+                print("TPOT params:", p)
+                print("X dtypes:")
+                print(X.dtypes.value_counts())
                 model.fit(X, y_encoded)
                 end_time = time.time()
 
@@ -1335,6 +1347,7 @@ def predict():
         # Load training data to get feature structure
         training_filepath = os.path.join(app.config['UPLOAD_FOLDER'], session['filename'])
         training_data = pd.read_csv(training_filepath)
+        training_data.columns = training_data.columns.str.strip()
         target_column = session['target_column']
         
         if target_column not in training_data.columns:
@@ -1345,6 +1358,7 @@ def predict():
         
         # Load and prepare prediction data
         pred_data = pd.read_csv(filepath)
+        pred_data.columns = pred_data.columns.str.strip()
         pred_data = pd.get_dummies(pred_data)
 
         selected_features = session.get('selected_features', [])
@@ -1395,6 +1409,7 @@ def download_predictions():
         # Load original training data for feature alignment
         training_filepath = os.path.join(app.config['UPLOAD_FOLDER'], session['filename'])
         training_data = pd.read_csv(training_filepath)
+        training_data.columns = training_data.columns.str.strip()
         X_train = pd.get_dummies(training_data.drop(columns=[session['target_column']]))
         
         selected_features = session.get('selected_features', [])
@@ -1482,6 +1497,7 @@ def upload_prediction():
         try:
             # Read and store prediction data
             df = pd.read_csv(file)
+            df.columns = df.columns.str.strip()
             session['prediction_data'] = df.to_json(orient='records')
             session['prediction_columns'] = df.columns.tolist()
             filename = secure_filename(file.filename)
