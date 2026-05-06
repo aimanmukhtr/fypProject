@@ -17,6 +17,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 import matplotlib.pyplot as plt
 import io
+import os
 import base64
 import pickle
 import json
@@ -65,6 +66,7 @@ bucket = storage.bucket()
 
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY', 'sk_test_51RSADZIEZSCBrBXvwlRklvjYUAXqfgKGxX6y02Y8Uzihwr0k7myIwlVV9gwQCFEFMWOI8ahGaiEK7mkBuNRf9H5H00vjcHSPKV')
 stripe_webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET', 'whsec_Z0QgZ3Ck7bgf4Vs9KcKOYEzkMd9AgZ29')
+IS_CLOUD = os.getenv("KOYEB_PUBLIC_DOMAIN") is not None
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'pdf'}
 
@@ -1532,4 +1534,5 @@ def restart():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 8080))
     app.run(debug=True)
