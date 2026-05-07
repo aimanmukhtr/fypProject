@@ -53,9 +53,15 @@ Session(app)
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# 🔵 Initialize Firebase Admin SDK (use your own serviceAccountKey.json)
-firebase_key_path = os.getenv("FIREBASE_KEY_PATH", "firebase_key.json")
-cred = credentials.Certificate(firebase_key_path)
+firebase_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+
+if firebase_json:
+    cred_dict = json.loads(firebase_json)
+    cred = credentials.Certificate(cred_dict)
+else:
+    firebase_key_path = os.getenv("FIREBASE_KEY_PATH", "firebase_key.json")
+    cred = credentials.Certificate(firebase_key_path)
+
 firebase_admin.initialize_app(cred, {
     'storageBucket': os.getenv("FIREBASE_STORAGE_BUCKET", "fypautoml.firebasestorage.app"),
     'projectId': os.getenv("FIREBASE_PROJECT_ID", "fypautoml")
