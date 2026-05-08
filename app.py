@@ -463,8 +463,8 @@ def create_checkout_session():
                 'quantity': 1, 
             }],
             mode='subscription',
-            success_url=f"https://gp-project-hdkx.onrender.com/payment-success?session_id={{CHECKOUT_SESSION_ID}}&uid={uid}&license_type={license_type}",
-            cancel_url="https://gp-project-hdkx.onrender.com/payment-cancelled",
+            success_url=f"https://fypproject-945914686130.asia-southeast3.run.app/payment-success?session_id={{CHECKOUT_SESSION_ID}}&uid={uid}&license_type={license_type}",
+            cancel_url="https://fypproject-945914686130.asia-southeast3.run.app/payment-cancelled",
             metadata={
                 'uid': uid,
                 'license_type': license_type,
