@@ -828,11 +828,6 @@ def get_receipt_url(uid):
             print(f"No file_name found in receipt document for UID: {uid}")
             return jsonify({'error': 'Receipt file name not found.'}), 404
 
-        # Generate signed URL using Google Cloud Storage
-        firebase_key_path = os.getenv("FIREBASE_KEY_PATH", "/etc/secrets/firebase_key.json")
-        gcs_client = gcs_storage.Client.from_service_account_json(firebase_key_path)
-
-        bucket = gcs_client.bucket('fypautoml.firebasestorage.app')  # ✅ Use the correct bucket name
         blob = bucket.blob(f'receipts/{file_name}')
         print(f"Checking blob: receipts/{file_name}")
 
