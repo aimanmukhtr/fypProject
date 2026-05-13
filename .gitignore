@@ -76,3 +76,4 @@ __pycache__/
 *.pyc
 .env
 firebase_key.json
+uploads/

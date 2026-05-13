@@ -688,6 +688,211 @@ input:focus {
     align-items: flex-start;
   }
 }
+
+.nav-link.active {
+  color: #3366FF;
+  font-weight: 600;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Pricing Section */
+.pricing-section {
+  padding: 4.5rem 1.5rem;
+  background: linear-gradient(to bottom right, #ffffff, #f8fafc);
+  border-top: 1px solid #e5e7eb;
+}
+
+.pricing-container {
+  max-width: 1050px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.pricing-header {
+  margin-bottom: 3.5rem;
+}
+
+.pricing-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.75rem;
+}
+
+.pricing-header p {
+  font-size: 1.05rem;
+  color: #6b7280;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 2.5rem;
+  align-items: stretch;
+}
+
+.pricing-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid #dbe3ef;
+  border-radius: 0.85rem;
+  padding: 2.5rem 2.2rem;
+  min-height: 430px;
+  box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.pricing-card:hover {
+  border-color: #3366FF;
+  box-shadow: 0 18px 40px -14px rgba(51, 102, 255, 0.35);
+  transform: translateY(-4px);
+}
+
+.pricing-card h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #3366FF;
+  margin-bottom: 1.8rem;
+}
+
+.card-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0 0 2rem;
+}
+
+.pricing-card ul {
+  list-style: none;
+  display: grid;
+  gap: 1rem;
+  text-align: left;
+}
+
+.pricing-card li {
+  color: #374151;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pricing-card li::before {
+  content: "✓";
+  background: #e0e7ff;
+  color: #3366FF;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-section {
+    padding: 3.5rem 1rem;
+  }
+
+  .pricing-card {
+    min-height: auto;
+  }
+}
+
+/* Contact Section */
+.contact-section {
+  padding: 5rem 1.5rem;
+  background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+  border-top: 1px solid #e5e7eb;
+}
+
+.contact-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-container h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.contact-subtitle {
+  max-width: 650px;
+  margin: 0 auto 4.5rem;
+  color: #6b7280;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+  align-items: start;
+}
+
+.contact-box {
+  text-align: center;
+}
+
+.contact-icon {
+  width: 5rem;
+  height: 5rem;
+  margin: 0 auto 1.8rem;
+  border-radius: 1.2rem;
+  background: rgba(51, 102, 255, 0.08);
+  color: #3366FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+}
+
+.contact-box h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.85rem;
+}
+
+.contact-box p {
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .contact-section {
+    padding: 4rem 1rem;
+  }
+}
 </style>
 <body>
   <header class="site-header">
@@ -696,15 +901,14 @@ input:focus {
         <span class="logo-text">AutoML<span class="logo-highlight">Pro</span></span>
       </div>
       <div class="nav-links">
-        <a href="#" class="nav-link">Home</a>
-        <a href="#" class="nav-link">Features</a>
-        <a href="#" class="nav-link">Pricing</a>
-        <a href="#" class="nav-link">Contact</a>
+        <a href="#home" class="nav-link active">Home</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="#contact" class="nav-link">Contact</a>
       </div>
     </nav>
   </header>
 
-  <main class="main-content">
+  <main class="main-content" id="home">
     <div class="auth-container">
       <div class="auth-content">
         <div class="auth-info">
@@ -843,6 +1047,72 @@ input:focus {
       </div>
     </div>
   </main>
+
+  <section id="pricing" class="pricing-section">
+    <div class="pricing-container">
+      <div class="pricing-header">
+        <h2>Choose Your Access Level</h2>
+        <p>Start with the plan that fits your machine learning needs.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <a href="#home" class="pricing-card">
+          <h3>Basic License</h3>
+          <p class="price">RM 10</p>
+          <div class="card-divider"></div>
+          <ul>
+            <li>Random Forest</li>
+            <li>SVM</li>
+            <li>KNN</li>
+            <li>Naive Bayes</li>
+            <li>Model evaluation dashboard</li>
+          </ul>
+        </a>
+
+        <a href="#home" class="pricing-card">
+          <h3>Advanced License</h3>
+          <p class="price">RM 15</p>
+          <div class="card-divider"></div>
+          <ul>
+            <li>Everything in Basic</li>
+            <li>TPOT AutoML</li>
+            <li>Pipeline optimization</li>
+            <li>Advanced model search</li>
+            <li>Prediction export</li>
+          </ul>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact-section">
+    <div class="contact-container">
+      <h2>Contact Us</h2>
+      <p class="contact-subtitle">
+        Need help with your account, license, payment, or dataset upload?
+      </p>
+
+      <div class="contact-grid">
+        <div class="contact-box">
+          <div class="contact-icon">☎</div>
+          <h3>Call / WhatsApp</h3>
+          <p>+60 13-797 2527</p>
+        </div>
+
+        <div class="contact-box">
+          <div class="contact-icon">✉</div>
+          <h3>Email Us At</h3>
+          <p>aimanmukhtar71@gmail.com</p>
+        </div>
+
+        <div class="contact-box">
+          <div class="contact-icon">?</div>
+          <h3>Platform Support</h3>
+          <p>Account, receipt, license and technical help.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <footer class="site-footer">
     <div class="footer-content">
